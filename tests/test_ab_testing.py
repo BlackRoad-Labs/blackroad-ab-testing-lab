@@ -85,11 +85,13 @@ def test_significance_check_not_enough_data(exp_with_variants):
 
 def test_significance_check_with_significant_data(exp_with_variants):
     lab, exp_id = exp_with_variants
-    # Very different distributions
+    # Very different distributions with variance
+    import random
+    rng = random.Random(99)
     for i in range(50):
-        lab.record_result(exp_id, f"c{i}", "control", 0.1)
+        lab.record_result(exp_id, f"c{i}", "control", rng.gauss(0.1, 0.02))
     for i in range(50):
-        lab.record_result(exp_id, f"t{i}", "treatment", 0.9)
+        lab.record_result(exp_id, f"t{i}", "treatment", rng.gauss(0.9, 0.02))
     result = lab.significance_check(exp_id)
     assert result["is_significant"]
 
@@ -117,8 +119,11 @@ def test_welchs_identical_samples():
 
 
 def test_welchs_very_different_samples():
-    a = [0.0] * 50
-    b = [1.0] * 50
+    # Use values with variance: group A near 0, group B near 1
+    import random
+    rng = random.Random(42)
+    a = [rng.gauss(0.0, 0.05) for _ in range(50)]
+    b = [rng.gauss(1.0, 0.05) for _ in range(50)]
     t, p, df = welchs_p_value(a, b)
     assert p < 0.001
 
