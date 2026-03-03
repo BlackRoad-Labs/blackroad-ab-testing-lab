@@ -796,6 +796,19 @@ def cmd_winner(args, lab: ABTestingLab) -> None:
         print(f"No winner: {result.get('reason', 'unknown')}")
 
 
+def cmd_ask(args, _lab: ABTestingLab) -> None:
+    from ollama_router import route, OLLAMA_TRIGGERS
+    text = args.prompt
+    try:
+        response = route(text, model=args.model or None, base_url=args.base_url or None)
+        print(response)
+    except ValueError as exc:
+        triggers = ", ".join(f"@{t}" for t in sorted(OLLAMA_TRIGGERS))
+        print(f"Error: {exc}\nSupported triggers: {triggers}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Ollama error: {exc}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="A/B Testing Lab")
     parser.add_argument("--db", help="Override database path")
@@ -835,6 +848,15 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("winner", help="Determine the winning variant")
     p.add_argument("exp_id")
     p.set_defaults(func=cmd_winner)
+
+    p = sub.add_parser(
+        "ask",
+        help="Route a prompt to Ollama via @ollama / @copilot / @lucidia / @blackboxprogramming",
+    )
+    p.add_argument("prompt", help="Prompt text (must contain a trigger mention)")
+    p.add_argument("--model", help="Ollama model name (default: llama3)")
+    p.add_argument("--base-url", dest="base_url", help="Ollama server base URL (default: http://localhost:11434)")
+    p.set_defaults(func=cmd_ask)
 
     return parser
 
