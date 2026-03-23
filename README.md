@@ -1,5 +1,13 @@
 # blackroad-ab-testing-lab
 
+> A/B testing framework for ML and product experiments
+
+Part of the [BlackRoad OS](https://blackroad.io) ecosystem — [BlackRoad-Labs](https://github.com/BlackRoad-Labs)
+
+---
+
+# blackroad-ab-testing-lab
+
 > A/B testing framework for ML and product experiments using pure Python stdlib
 
 Run statistically rigorous A/B tests with Welch's t-test, confidence intervals, and winner determination. Uses only Python's `statistics` and `math` stdlib — no scipy or numpy required.
